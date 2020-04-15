@@ -92,3 +92,40 @@ namespace Primality{
 		return true; //number is probably primes
 	}
 };
+
+namespace RSA_Encryption
+{
+    RSA_Private_Key Generate_Private_Key(InfInt min, InfInt max)
+    {
+        RSA_Private_Key key;
+        key.factor1 = Primality::Generate_Random_Prime(min,max);
+        key.factor2 = Primality::Generate_Random_Prime(min,max);
+        key.Public_Key.N = key.factor1 * key.factor2;
+        key.Public_Key.e = random_number(min, max)
+			% ((key.factor1-1) * (key.factor2-1));
+        while(euclidean_gcd(key.Public_Key.e, (key.factor1-1)*(key.factor2-1)) != 1)
+        {
+            key.Public_Key.e = random_number(min, max) % ((key.factor1-1)*(key.factor2-1));
+        }
+        key.d = extended_euclidean_inverse(key.Public_Key.e, (key.factor1-1)*(key.factor2-1));
+        return key;
+    }
+
+    InfInt Encrypt_Number(InfInt value, RSA_Private_Key key)
+    {
+        return power_mod(value, key.Public_Key.e, (key.factor1-1)*(key.factor2-1));
+    }
+    
+};
+
+struct RSA_Public_Key{
+    InfInt N;
+    InfInt e;
+};
+
+struct RSA_Private_Key{
+    RSA_Public_Key Public_Key;
+    InfInt d;
+    InfInt factor1;
+    InfInt factor2;
+};
